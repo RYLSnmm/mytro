@@ -1,12 +1,14 @@
+import { StorageLocal } from "./storage/local.js"
+
 export default class Mytro {
-	constructor() {
+	constructor(opt) {
+		this.storage = opt.storage || new StorageLocal()
 		this.data = {
 			// タイトル一覧
 			titles: [],
 			// import/export 用のチェック用キー
 			key: "af73c90184b9d1f0",
 		}
-		this.storage_key = "mytro-data"
 		this.load()
 	}
 
@@ -187,20 +189,23 @@ export default class Mytro {
 	}
 
 	/**
-	 * localStorage にセーブ
+	 * ストレージにセーブ
 	 */
-	save() {
-		localStorage[this.storage_key] = JSON.stringify(this.data)
+	async save() {
+		this.storage.save(this.data)
 	}
 
 	/**
-	 * localStorage からロード
+	 * ストレージからロード
 	 */
-	load() {
-		const obj = JSON.parse(localStorage[this.storage_key] || "null")
+	async load() {
+		let resolve
+		this.ready = new Promise(r => (resolve = r))
+		const obj = await this.storage.load()
 		if (obj) {
 			this.data = obj
 		}
+		resolve()
 	}
 
 	/**
@@ -227,9 +232,7 @@ export default class Mytro {
 		if (!ok) throw { user_error: true, message }
 
 		// バックアップ
-		if ("data" in localStorage) {
-			localStorage["backup"] = localStorage["data"]
-		}
+		this.storage.backup()
 
 		this.data = data
 		this.save()

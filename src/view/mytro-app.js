@@ -1,4 +1,6 @@
 import Mytro, { Title, Achievement } from "../data/mytro.js"
+import { StorageGist } from "../data/storage/gist.js"
+import { StorageLocal } from "../data/storage/local.js"
 import { html, render } from "https://unpkg.com/lit-html@1.0.0?module"
 
 class MytroApp extends HTMLElement {
@@ -7,7 +9,19 @@ class MytroApp extends HTMLElement {
 		this.attachShadow({ mode: "open" })
 		this.shadowRoot.adoptedStyleSheets = [MytroApp.css]
 
-		this.mytro = new Mytro()
+		// gist
+		this.gist = {
+			storage: localStorage.gist_storage === "1",
+			autoload: localStorage.gist_autoload === "1",
+			autosave: localStorage.gist_autosave === "1",
+			gistid: localStorage.gist_gistid || "",
+			token: localStorage.gist_token || "",
+		}
+
+		this.mytro = new Mytro({
+			storage: this.gist.storage ? new StorageGist(this.gist) : new StorageLocal(),
+		})
+
 		this.view_state = new WeakMap()
 		this.selected_name = null
 		this.dialog = null
@@ -28,6 +42,7 @@ class MytroApp extends HTMLElement {
 
 	async connectedCallback() {
 		await MytroApp.css_ready
+		await this.mytro.ready
 		this.render()
 	}
 
@@ -41,6 +56,11 @@ class MytroApp extends HTMLElement {
 		this.dialog = "import"
 		this.pending_file = null
 		this.file_text = ""
+		this.render()
+	}
+
+	onGist(eve) {
+		this.dialog = "gist"
 		this.render()
 	}
 
@@ -72,6 +92,49 @@ class MytroApp extends HTMLElement {
 		a.download = "mytro-export-" + Date.now() + ".json"
 		a.href = "data://," + encodeURIComponent(this.export_text)
 		a.click()
+	}
+
+	async onGistImport(eve) {
+		const storage = new StorageGist({
+			gistid: this.gist.gistid,
+			token: this.gist.token,
+		})
+
+		let data
+		try {
+			data = await storage.load({ manually: true })
+		} catch (err) {
+			console.error("gist error", err, err.info)
+			if (err.info) {
+				alert("Gist ファイルの読み込みに失敗しました：" + err.message)
+			}
+			return
+		}
+		this.mytro.import(JSON.stringify(data))
+		this.dialog = null
+		this.render()
+		alert("インポートに成功しました")
+	}
+
+	async onGistExport(eve) {
+		const storage = new StorageGist({
+			gistid: this.gist.gistid,
+			token: this.gist.token,
+		})
+
+		const json = this.mytro.export()
+		try {
+			await storage.save(JSON.parse(json), { manually: true })
+		} catch (err) {
+			console.error("gist error", err, err.info)
+			if (err.info) {
+				alert("Gist ファイルの保存に失敗しました：" + err.message)
+			}
+			return
+		}
+		this.gist.gistid = storage.gs.gistid
+		this.render()
+		alert("エクスポートに成功しました")
 	}
 
 	onClickDialogBack(eve) {
@@ -231,6 +294,14 @@ class MytroApp extends HTMLElement {
 		const target_name = eve.target.closest(".item").data.name
 		const done = eve.target.checked
 		this.mytro.updateAchievement(this.selected_name, target_name, { done })
+		this.render()
+	}
+
+	onInputGist(eve) {
+		const name = eve.target.name
+		if (name) {
+			this.gist[name] = eve.target.value
+		}
 		this.render()
 	}
 
@@ -528,6 +599,36 @@ class MytroApp extends HTMLElement {
 			</div>
 		`
 
+		const gistDialogTemplate = () => html`
+			<div class="gist-dialog dialog" ?hidden=${this.dialog !== "gist"}>
+				<div class="form" @input=${this.onInputGist}>
+					<table>
+						<tr>
+							<th>gistid</th>
+							<td>
+								<input type="text" name="gistid" .value=${this.gist.gistid} />
+								<span class="desc">保存先の Gist の ID ※新規作成するなら空</span>
+							</td>
+						</tr>
+						<tr>
+							<th>token</th>
+							<td>
+								<input type="text" name="token" .value=${this.gist.token} />
+								<span class="desc"
+									>保存時に使う token ※gist が許可されてる必要あり
+									※エクスポート（保存）しないならいらない</span
+								>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="bottom-btns">
+					<button @click=${this.onGistImport}>インポート</button>
+					<button @click=${this.onGistExport}>エクスポート</button>
+				</div>
+			</div>
+		`
+
 		const backimg = type => {
 			if (type === "one" && this.selected_name) {
 				const [title] = this.mytro.findTitle(this.selected_name)
@@ -599,6 +700,7 @@ class MytroApp extends HTMLElement {
 							</label>
 							<button @click=${this.onImport}>IMPORT</button>
 							<button @click=${this.onExport}>EXPORT</button>
+							<button @click=${this.onGist}>Gist</button>
 						</div>
 					</div>
 				</header>
@@ -631,6 +733,7 @@ class MytroApp extends HTMLElement {
 						${this.deleting && deleteDialogTemplate()}
 						${importDialogTemplate()}
 						${exportDialogTemplate()}
+						${gistDialogTemplate()}
 					</div>
 				</div>
 			</div>
