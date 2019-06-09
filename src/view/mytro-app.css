@@ -1,0 +1,822 @@
+* {
+	box-sizing: border-box;
+}
+
+:host {
+	width: 100vw;
+	height: 100vh;
+	display: block;
+	overflow-x: auto;
+	position: fixed;
+	left: 0;
+	top: 0;
+	font-size: 14px;
+}
+
+input, textarea, select {
+	font-family: meiryo;
+}
+
+.root {
+	min-width: 1200px;
+	height: 100%;
+	flex-flow: column nowrap;
+	display: flex;
+}
+
+.container {
+	width: 1200px;
+	margin: auto;
+}
+
+/* header */
+
+.header {
+	background-color: aliceblue;
+	border-bottom: 2px solid #56568a;
+	flex: none;
+	position: relative;
+	z-index: 1;
+}
+
+.header h1 {
+	color: darkcyan;
+	font-size: 20px;
+	line-height: 36px;
+	margin: auto;
+}
+
+.toggle-edit {
+	margin-right: 10px;
+}
+
+.toggle-edit input {
+	display: none;
+}
+
+.toggle-edit .toggle-edit-button {
+	border-radius: 5px;
+	padding: 0 8px;
+	border: 2px solid darkcyan;
+	color: darkcyan;
+	display: flex;
+	align-items: center;
+}
+
+.toggle-edit input:checked + .toggle-edit-button {
+	background: darkcyan;
+	color: aliceblue;
+}
+
+.header button {
+	width: 80px;
+	padding: 2px 6px;
+	margin: 0 0 0 6px;
+	border: 0;
+	background: transparent;
+	font-size: 16px;
+	color: darkcyan;
+	border-bottom: 1px solid darkcyan;
+	outline: none;
+}
+
+.header button:hover {
+	border-bottom-width: 2px;
+	font-weight: bold;
+}
+
+.header button:active {
+	border-bottom-color: cornflowerblue;
+}
+
+/* body */
+
+.body {
+	height: 0;
+	flex: 1 1 auto;
+	padding: 5px 0;
+	overflow-y: overlay;
+	position: relative;
+	background-image: linear-gradient(#999, #111);
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+
+.body .backimg {
+	position: absolute;
+	z-index: 0;
+	width: 100%;
+	height: 300px;
+	top: 0;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.body .backimg[data-mode="one"] {
+	background-position: center center;
+	background-size: contain;
+}
+
+.body .backimg[data-mode="list"] {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: flex-start;
+	align-content: flex-start;
+	justify-content: center;
+	background-color: #fafafa;
+}
+
+.body .backimg .backimg-cover {
+	box-shadow: inset 0 0 3px 1px #fff, inset 0 0 10px 5px #fff;
+}
+
+.body .backimg img {
+	height: 100px;
+	display: block;
+	position: relative;
+	z-index: -1;
+}
+
+.body .container {
+	position: relative;
+	z-index: 1;
+	margin-top: 250px;
+	height: 100%;
+}
+
+.body .content {
+	height: 100%;
+	display: flex;
+	box-shadow: 0 0 15px 3px #0005;
+	background: #e8e8e8;
+	overflow-x: hidden;
+}
+
+.body .title-list {
+	width: 800px;
+	flex: 0 0 auto;
+	transition: width 0.2s linear 0s;
+	max-height: 100%;
+	margin: 0 auto;
+	border: 1px solid #ccc;
+	background: #fafafa;
+}
+
+.body [data-show-achievement] .title-list {
+	width: 500px;
+	min-width: 500px;
+}
+
+.body .achievement-list-wrapper {
+	flex: 0 1 auto;
+	width: 0;
+	transition: flex 0.2s linear 0s;
+}
+
+.body [data-show-achievement] .achievement-list-wrapper {
+	flex: 1 1 auto;
+}
+
+.hover-scroll {
+	overflow-y: hidden;
+}
+
+.hover-scroll:hover {
+	overflow-y: overlay;
+}
+
+.hover-scroll::-webkit-scrollbar {
+	width: 6px;
+}
+
+.hover-scroll::-webkit-scrollbar-track {
+	background: #f0f0f0aa;
+	border: none;
+	box-shadow: inset 0 0 2px #aaa;
+}
+
+.hover-scroll::-webkit-scrollbar-thumb {
+	background: #777a;
+	border-radius: 8px;
+}
+
+.title {
+	border-bottom: 1px solid #ccc;
+	padding: 5px;
+}
+
+.title[data-selected] {
+	background: #fff6e2;
+}
+
+.title .summary {
+	display: flex;
+	align-items: center;
+}
+
+.title .info {
+	margin-left: 10px;
+	flex: 1 1 auto;
+}
+
+.title .icon {
+	width: 100px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.title .name {
+	font-size: 15px;
+}
+
+.title .title-top-right {
+	margin-right: 8px;
+	flex: 0 0 auto;
+}
+
+.title .platform {
+	border-radius: 2px;
+	padding: 1px 10px;
+	font-size: 12px;
+	background: #ff526e;
+	color: #fafafa;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.title .edit-buttons button .material-icons {
+	font-size: 14px;
+}
+
+.title .groups {
+	display: flex;
+	flex-flow: row wrap;
+	margin-top: 6px;
+	margin-bottom: 3px;
+}
+
+.title .groups .group {
+	padding: 1px 6px;
+	background: #ec8a43;
+	color: white;
+	margin: 0 3px 2px 0;
+	font-size: 11px;
+	cursor: pointer;
+	border-radius: 2px;
+}
+
+.title .icon img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.title .status {
+	font-size: 12px;
+	color: #444;
+	margin-top: 3px;
+}
+
+.title .gauge {
+	display: flex;
+	flex: 1 1 auto;
+}
+
+.title .gauge-normal,
+.title .gauge-extra {
+	width: 50%;
+	margin: 0 2px;
+	height: 8px;
+	background: #e0e0e0;
+}
+
+.title .gauge-normal div {
+	background: #5ec84e;
+	height: 100%;
+}
+
+.title .gauge-extra div {
+	background: cornflowerblue;
+	height: 100%;
+}
+
+.title .gauge [data-empty] {
+	background: #fff;
+	border: 1px dashed #ccc;
+}
+
+.title .status-detail {
+	flex: none;
+	display: flex;
+}
+
+.title .status-detail .normal,
+.title .status-detail .extra {
+	width: 50%;
+	display: inline-block;
+}
+
+.title .status-detail .count {
+	font-weight: bold;
+}
+
+.title .status-detail .count[data-complete] {
+	color: crimson;
+}
+
+.title .desc {
+	font-size: 12px;
+	color: #444;
+}
+
+.title .note {
+	font-size: 13px;
+}
+
+.achievement-list-wrapper {
+	display: flex;
+	flex-flow: column;
+}
+
+.title-status {
+	background: #ccc;
+	border-bottom: 1px solid #aaa;
+	flex: 0 0 auto;
+	display: flex;
+}
+
+.title-status .back {
+	transform: scaleX(-1);
+	flex: none;
+	margin-right: 10px;
+	border: 0;
+	border-left: 1px solid #888;
+	background: #aaa;
+	width: 50px;
+	font-size: 30px;
+	color: #444;
+	cursor: pointer;
+	outline: none;
+}
+
+.title-status .back:hover {
+	background: #999;
+}
+
+.title-status .row1,
+.title-status .row2,
+.title-status .row3 {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+
+.title-status .name {
+	font-size: 15px;
+	padding: 3px 0;
+}
+
+.title-status .platform {
+	background: #eee;
+	color: #336;
+	padding: 3px 6px;
+}
+
+.title-status .timestamp {
+	color: #888;
+	font-size: 11px;
+	width: 200px;
+}
+
+.title-status .rate {
+	display: flex;
+	align-items: center;
+	flex: 1 1 auto;
+}
+
+.title-status .gauge-label {
+	width: 110px;
+	color: #696969;
+	font-size: 12px;
+}
+
+.title-status .gauge-label .count {
+	font-weight: bold;
+}
+
+.title-status .gauge-label .count[data-complete] {
+	color: firebrick;
+}
+
+.title-status .gauge {
+	flex: 1 1 auto;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.title-status .gauge-normal,
+.title-status .gauge-extra {
+	margin: 0 2px;
+	height: 8px;
+	background: #e0e0e0;
+}
+
+.title-status .gauge-normal div {
+	background: #5ec84e;
+	height: 100%;
+}
+
+.title-status .gauge-extra div {
+	background: cornflowerblue;
+	height: 100%;
+}
+
+.title-status .gauge [data-empty] {
+	background: #fff;
+	border: 1px dashed #ccc;
+}
+
+.achievement-list {
+	width: 690px;
+	margin: 5px;
+	border: 1px solid #ccc;
+	background: #fafafa;
+	flex: 0 1 auto;
+}
+
+.achievement {
+	border-bottom: 1px solid #ccc;
+	padding: 5px;
+}
+
+.achievement .summary {
+	display: flex;
+	align-items: center;
+}
+
+.achievement .check {
+	width: 60px;
+	height: 60px;
+	padding: 8px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.achievement .toggle-done input {
+	display: none;
+}
+
+.achievement .toggle-done div {
+	width: 100%;
+	height: 100%;
+	border: 3px solid;
+	border-radius: 8px;
+	cursor: pointer;
+	color: #ddd;
+	font-size: 40px;
+	font-family: meiryo ui;
+	font-weight: bold;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.achievement[data-type="normal"] .toggle-done div {
+	border-color: #5ec84e;
+}
+
+.achievement[data-type="extra"] .toggle-done div {
+	border-color: cornflowerblue;
+}
+
+.achievement[data-type="normal"] .toggle-done input:checked + div {
+	background-color: #5ec84e;
+	color: white;
+}
+
+.achievement[data-type="extra"] .toggle-done input:checked + div {
+	background-color: cornflowerblue;
+	color: white;
+}
+
+.achievement .info {
+	flex: 1 1 auto;
+}
+
+.achievement .name {
+	font-size: 15px;
+}
+
+.achievement .desc {
+	font-size: 12px;
+}
+
+.achievement .timestamps {
+	font-size: 11px;
+	color: #888;
+	text-align: right;
+	padding-right: 3px;
+	margin-top: 5px;
+}
+
+.achievement .note {
+	font-size: 13px;
+}
+
+.achievement .edit-buttons {
+	flex: 0 0 auto;
+	padding-right: 3px;
+}
+
+.achievement .edit-buttons button .material-icons {
+	font-size: 14px;
+}
+
+.create {
+	width: 40px;
+	height: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 3px solid #c0c0c0;
+	margin: 15px 25px;
+	font-size: 30px;
+	color: #c0c0c0;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+/* footer */
+
+.footer {
+	height: 28px;
+	flex: none;
+	background: #282828;
+	position: relative;
+	z-index: 1;
+}
+
+/* dialogs */
+
+.dialog-back {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	background: #00000050;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 2;
+}
+
+.dialog {
+	background: #fffffff0;
+	box-shadow: 0 0 4px 1px #fff4;
+}
+
+.delete-dialog {
+	padding: 20px 40px;
+}
+
+.edit-title-dialog {
+	padding: 20px 40px;
+	max-height: 90%;
+	display: flex;
+	flex-flow: column;
+}
+
+.edit-title-dialog .form {
+	flex: 1 1 auto;
+	overflow: auto;
+}
+
+.edit-title-dialog .sup {
+	font-size: 12px;
+}
+
+.edit-title-dialog table {
+	width: 800px;
+}
+
+.edit-title-dialog th {
+	width: 130px;
+	padding: 10px 5px;
+}
+
+.edit-title-dialog td {
+	padding: 10px;
+}
+
+.edit-title-dialog .img-row {
+	display: flex;
+	align-items: center;
+	margin: 5px 0;
+}
+
+.edit-title-dialog .img-label {
+	width: 80px;
+}
+
+.edit-title-dialog input[type="text"] {
+	width: 100%;
+	padding: 2px 8px;
+}
+
+.edit-title-dialog textarea {
+	width: 100%;
+	padding: 2px 8px;
+	min-height: 100px;
+}
+
+.edit-achievement-dialog {
+	padding: 20px 40px;
+	max-height: 90%;
+	display: flex;
+	flex-flow: column;
+}
+
+.edit-achievement-dialog .form {
+	flex: 1 1 auto;
+	overflow: auto;
+}
+
+.edit-achievement-dialog .sup {
+	font-size: 12px;
+}
+
+.edit-achievement-dialog table {
+	width: 800px;
+}
+
+.edit-achievement-dialog th {
+	width: 130px;
+	padding: 10px 5px;
+}
+
+.edit-achievement-dialog td {
+	padding: 10px;
+}
+
+.edit-achievement-dialog input[type="text"] {
+	width: 100%;
+	padding: 2px 8px;
+}
+
+.edit-achievement-dialog .achievement-type {
+	margin-right: 40px;
+}
+
+.edit-achievement-dialog .achievement-type input {
+	width: 18px;
+	height: 18px;
+	vertical-align: sub;
+}
+
+.edit-achievement-dialog textarea {
+	width: 100%;
+	padding: 2px 8px;
+	min-height: 100px;
+}
+
+.import-dialog {
+	padding: 25px;
+}
+
+.import-dialog .dropcatcher {
+	width: 600px;
+	height: 300px;
+	border: 2px solid #aaa;
+	position: relative;
+}
+
+.import-dialog .dropcatcher:hover {
+	border-style: dashed;
+}
+
+.import-dialog .dropcatcher .backmessage {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	font-size: 32px;
+	color: #aaa;
+	background: #f0f0f0;
+	letter-spacing: 0.2em;
+}
+
+.import-dialog .dropcatcher .preview {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	margin: 0;
+	white-space: pre-wrap;
+	word-break: break-all;
+	overflow: hidden;
+	padding: 5px;
+	font-size: 12px;
+	line-height: 1.1em;
+}
+
+.import-dialog .dropcatcher .fileinput {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	opacity: 0;
+}
+
+.export-dialog {
+	padding: 25px;
+}
+
+.export-dialog textarea {
+	width: 600px;
+	height: 300px;
+	tab-size: 2;
+}
+
+.dialog .bottom-btns {
+	text-align: center;
+	margin-top: 25px;
+}
+
+.dialog .bottom-btns button {
+	margin: 0 5px;
+	width: 130px;
+	line-height: 24px;
+}
+
+/* commons */
+
+.flex-row {
+	display: flex;
+	flex-flow: row;
+}
+
+.flex-col {
+	display: flex;
+	flex-flow: column;
+}
+
+.flex-auto {
+	flex: 1 1 auto;
+}
+
+.flex-fixed {
+	flex: none;
+}
+
+.flex-two-side {
+	justify-content: space-between;
+}
+
+.flex-mx-centering {
+	justify-content: center;
+}
+
+.flex-cx-centering {
+	align-items: center;
+}
+
+.flex-centering {
+	justify-content: center;
+	align-items: center;
+}
+
+[data-mode="view"] .only-editable {
+	display: none;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+/* for icon font
+ * https://google.github.io/material-design-icons/ */
+.material-icons {
+	font-family: "Material Icons";
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px; /* Preferred icon size */
+	display: inline-block;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+
+	/* Support for all WebKit browsers. */
+	-webkit-font-smoothing: antialiased;
+	/* Support for Safari and Chrome. */
+	text-rendering: optimizeLegibility;
+
+	/* Support for Firefox. */
+	-moz-osx-font-smoothing: grayscale;
+
+	/* Support for IE. */
+	font-feature-settings: "liga";
+}
