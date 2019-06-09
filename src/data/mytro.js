@@ -24,6 +24,7 @@ export default class Mytro {
 
 		const new_title = Object.assign(Title(), title)
 		this.data.titles.push(new_title)
+		this.save()
 		return true
 	}
 
@@ -37,6 +38,7 @@ export default class Mytro {
 
 		if (idx < 0) return false
 		this.data.titles.splice(idx, 1)
+		this.save()
 		return true
 	}
 
@@ -51,6 +53,7 @@ export default class Mytro {
 		if (!target) return false
 		if (target.name !== new_title.name && this.checkTitleNameDuplication(new_title.name)) return false
 		Object.assign(target, { ...new_title, modified_at: new Date() })
+		this.save()
 		return true
 	}
 
@@ -98,6 +101,7 @@ export default class Mytro {
 		if (!title || this.checkAchievementNameDuplication(title, achievement.name)) return false
 		const new_achievement = Object.assign(Achievement(), achievement)
 		title.achievements.push(new_achievement)
+		this.save()
 		return true
 	}
 
@@ -114,6 +118,7 @@ export default class Mytro {
 		const [_, idx] = this.findAchievement(title, target_achievement)
 		if (idx < 0) return false
 		title.achievements.splice(idx, 1)
+		this.save()
 		return true
 	}
 
@@ -133,6 +138,7 @@ export default class Mytro {
 		if (target.name !== new_achievement.name && this.checkAchievementNameDuplication(title, new_achievement.name))
 			return false
 		Object.assign(target, { ...new_achievement, modified_at: new Date() })
+		this.save()
 		return true
 	}
 
